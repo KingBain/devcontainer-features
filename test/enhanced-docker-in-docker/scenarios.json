@@ -1,0 +1,9 @@
+{
+  "ubuntu_base": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "enhanced-docker-in-docker": {}
+    },
+    "remoteUser": "root"
+  }
+}
