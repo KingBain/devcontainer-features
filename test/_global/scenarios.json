@@ -5,5 +5,12 @@
       "databricks-cli": {}
     },
     "remoteUser": "root"
+  },
+  "enhanced_docker_in_docker_on_ubuntu": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "enhanced-docker-in-docker": {}
+    },
+    "remoteUser": "root"
   }
 }
