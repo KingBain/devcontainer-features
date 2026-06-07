@@ -32,6 +32,10 @@ update_trust_store() {
   fi
 }
 
+count_certificates() {
+  find "$1" -maxdepth 1 -type f -name '*.crt' | wc -l | tr -d ' '
+}
+
 CERT_DIR="$(detect_cert_directory)"
 SOURCE_CERT_DIR="${SOURCECERTIFICATEDIRECTORY:-}"
 REQUIRED="${REQUIRED:-true}"
@@ -63,19 +67,25 @@ fi
 
 if [ -n "${SOURCE_CERT_DIR}" ]; then
   if [ ! -d "${SOURCE_CERT_DIR}" ]; then
-    exit 0
+    echo "Source certificate directory ${SOURCE_CERT_DIR} does not exist; skipping source copy"
+    if [ "$(count_certificates "${CERT_DIR}")" = "0" ]; then
+      exit 0
+    fi
+  else
+    SOURCE_CERT_COUNT="$(count_certificates "${SOURCE_CERT_DIR}")"
+    if [ "${SOURCE_CERT_COUNT}" = "0" ]; then
+      echo "No .crt files found in source certificate directory ${SOURCE_CERT_DIR}; skipping source copy"
+      if [ "$(count_certificates "${CERT_DIR}")" = "0" ]; then
+        exit 0
+      fi
+    else
+      echo "Copying ${SOURCE_CERT_COUNT} certificate file(s) from ${SOURCE_CERT_DIR} to ${CERT_DIR}"
+      find "${SOURCE_CERT_DIR}" -maxdepth 1 -type f -name '*.crt' -exec cp {} "${CERT_DIR}/" \;
+    fi
   fi
-
-  SOURCE_CERT_COUNT="$(find "${SOURCE_CERT_DIR}" -maxdepth 1 -type f -name '*.crt' | wc -l | tr -d ' ')"
-  if [ "${SOURCE_CERT_COUNT}" = "0" ]; then
-    exit 0
-  fi
-
-  echo "Copying ${SOURCE_CERT_COUNT} certificate file(s) from ${SOURCE_CERT_DIR} to ${CERT_DIR}"
-  find "${SOURCE_CERT_DIR}" -maxdepth 1 -type f -name '*.crt' -exec cp {} "${CERT_DIR}/" \;
 fi
 
-CERT_COUNT="$(find "${CERT_DIR}" -maxdepth 1 -type f -name '*.crt' | wc -l | tr -d ' ')"
+CERT_COUNT="$(count_certificates "${CERT_DIR}")"
 
 if [ "${CERT_COUNT}" = "0" ]; then
   if [ "${REQUIRED}" = "true" ]; then
