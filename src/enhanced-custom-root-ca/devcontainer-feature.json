@@ -11,7 +11,7 @@
       "default": "custom-root-ca.crt",
       "description": "Name of the custom root CA"
     },
-    "source": {
+    "sources": {
       "type": "string",
       "default": "https://netfree.link/cacert/isp/018/ca.crt",
       "proposals": [
@@ -30,10 +30,10 @@
       "default": true,
       "description": "Create a certificate bundle of all applied CAs"
     },
-    "verify": {
+    "allowInsecureDownload": {
       "type": "boolean",
-      "default": true,
-      "description": "Verify the downloaded SSL certificate"
+      "default": false,
+      "description": "Allow downloading certificates without validating the HTTPS server TLS certificate."
     }
   },
   "installsAfter": [

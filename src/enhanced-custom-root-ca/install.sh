@@ -4,10 +4,10 @@ set -e
 
 # Satisfy ShellCheck by providing defaults for variables injected by the DevContainer
 NAME="${NAME:-custom-root-ca.crt}"
-SOURCE="${SOURCE:-}"
+SOURCES="${SOURCES:-}"
 FINGERPRINTS="${FINGERPRINTS:-}"
 BUNDLE="${BUNDLE:-true}"
-VERIFY="${VERIFY:-true}"
+ALLOWINSECUREDOWNLOAD="${ALLOWINSECUREDOWNLOAD:-false}"
 
 fatal() {
   echo "⛔ " "$@" >&2
@@ -40,12 +40,12 @@ check_packages() {
   fi
 }
 
-set_insecure_flag() {
+set_insecure_download_flag() {
   downloader="$1"
   flag=""
 
-  if [ "${VERIFY}" = "false" ]; then
-    echo "🙈 Ignoring security verification"
+  if [ "${ALLOWINSECUREDOWNLOAD}" = "true" ]; then
+    echo "🙈 Allowing insecure download without TLS certificate validation"
 
     case "$downloader" in
       curl)
@@ -69,11 +69,11 @@ download() {
   echo "📁 Save certificate to ${cert_name}"
 
   if [ -x "$(command -v wget)" ]; then
-    set_insecure_flag wget
+    set_insecure_download_flag wget
     # shellcheck disable=SC2086
     wget -q $flag "$url_source" -O "$cert_name"
   elif [ -x "$(command -v curl)" ]; then
-    set_insecure_flag curl
+    set_insecure_download_flag curl
     # shellcheck disable=SC2086
     curl -sfL $flag "$url_source" -o "$cert_name"
   else
@@ -134,7 +134,7 @@ check_packages
 counter=0
 filename=$(echo "$NAME" | cut -d . -f 1)
 extension=$(echo "$NAME" | cut -d . -f 2-)
-certs=$(echo "$SOURCE" | tr ',' '\n')
+certs=$(echo "$SOURCES" | tr ',' '\n')
 dest_dir=/usr/local/share/ca-certificates
 
 mkdir -p "$dest_dir"
