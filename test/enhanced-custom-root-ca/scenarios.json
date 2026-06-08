@@ -13,7 +13,9 @@
   "alpine": {
     "image": "mcr.microsoft.com/devcontainers/base:alpine",
     "features": {
-      "enhanced-custom-root-ca": {}
+      "enhanced-custom-root-ca": {
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
+      }
     }
   },
   "multiple": {

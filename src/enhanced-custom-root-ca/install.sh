@@ -2,6 +2,11 @@
 
 set -e
 
+fatal() {
+  echo "⛔ " "$@" >&2
+  exit 1
+}
+
 # Satisfy ShellCheck by providing defaults for variables injected by the DevContainer
 NAME="${NAME:-custom-root-ca.crt}"
 SOURCES="${SOURCES:-}"
@@ -10,13 +15,8 @@ BUNDLE="${BUNDLE:-true}"
 ALLOWINSECUREDOWNLOAD="${ALLOWINSECUREDOWNLOAD:-false}"
 
 if [ -z "${SOURCES}" ]; then
-  fatal "No certificate source was provided. Set the 'source' option to a certificate URL, or a comma-separated list of certificate URLs."
+  fatal "No certificate sources were provided. Set the 'sources' option to a certificate URL, or a comma-separated list of certificate URLs."
 fi
-
-fatal() {
-  echo "⛔ " "$@" >&2
-  exit 1
-}
 
 check_packages() {
   if ! command -v curl > /dev/null 2>&1 && ! command -v wget > /dev/null 2>&1; then
