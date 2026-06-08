@@ -77,12 +77,25 @@ download() {
 
   if [ -x "$(command -v wget)" ]; then
     set_insecure_download_flag wget
-    # shellcheck disable=SC2086
-    wget -q $flag "$url_source" -O "$cert_name"
+    wget \
+      -q \
+      -T 60 \
+      -t 3 \
+      $flag \
+      "$url_source" \
+      -O "$cert_name"
   elif [ -x "$(command -v curl)" ]; then
     set_insecure_download_flag curl
-    # shellcheck disable=SC2086
-    curl -sfL $flag "$url_source" -o "$cert_name"
+    curl \
+      -sfL \
+      --connect-timeout 15 \
+      --max-time 60 \
+      --retry 3 \
+      --retry-delay 3 \
+      --retry-all-errors \
+      $flag \
+      "$url_source" \
+      -o "$cert_name"
   else
     fatal "Could not find curl or wget, please install one."
   fi
