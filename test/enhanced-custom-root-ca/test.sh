@@ -1,15 +1,14 @@
 #!/bin/bash
 
-# Test: devcontainer features test --features  custom-root-ca --remote-user root --skip-scenarios --base-image mcr.microsoft.com/devcontainers/base:ubuntu
-
 set -e
 
+# shellcheck source=/dev/null
 source dev-container-features-test-lib
 
-check "Cert installed" test /usr/local/share/ca-certificates/custom-root-ca.crt
-check "Cert linked" ls -alh /etc/ssl/certs | grep custom-root-ca.crt
+check "Cert installed" test -f /usr/local/share/ca-certificates/custom-root-ca.crt
+check "Cert linked" [ -L /etc/ssl/certs/custom-root-ca.pem ]
 
-check "Cert bundle installed" test /usr/local/share/ca-certificates/custom-root-ca.bundle.crt
-check "Cert bundle linked" ls -alh /etc/ssl/certs | grep custom-root-ca.bundle.crt
+check "Cert bundle installed" test -f /usr/local/share/ca-certificates/custom-root-ca.bundle.crt
+check "Cert bundle linked" [ -L /etc/ssl/certs/custom-root-ca.bundle.pem ]
 
 reportResults
