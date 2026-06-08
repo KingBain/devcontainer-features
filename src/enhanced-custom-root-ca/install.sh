@@ -15,7 +15,8 @@ BUNDLE="${BUNDLE:-true}"
 ALLOWINSECUREDOWNLOAD="${ALLOWINSECUREDOWNLOAD:-false}"
 
 if [ -z "${SOURCES}" ]; then
-  fatal "No certificate sources were provided. Set the 'sources' option to a certificate URL, or a comma-separated list of certificate URLs."
+  echo "ℹ️ No certificate sources were provided. Skipping custom root CA installation."
+  exit 0
 fi
 
 check_packages() {
