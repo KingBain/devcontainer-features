@@ -2,19 +2,26 @@
 
 set -e
 
+# Satisfy ShellCheck by providing defaults for variables injected by the DevContainer
+NAME="${NAME:-custom-root-ca.crt}"
+SOURCE="${SOURCE:-}"
+FINGERPRINTS="${FINGERPRINTS:-}"
+BUNDLE="${BUNDLE:-true}"
+VERIFY="${VERIFY:-true}"
+
 fatal() {
   echo "⛔ " "$@" >&2
   exit 1
 }
 
 set_insecure_flag() {
-  local downloader=$1
+  downloader="$1"
   flag=""
 
   if [ "${VERIFY}" = "false" ]; then
     echo "🙈 Ignoring security verification"
 
-    case $downloader in
+    case "$downloader" in
       curl)
         flag="--insecure"
         ;;
@@ -29,26 +36,28 @@ set_insecure_flag() {
 }
 
 download() {
-  local source=$1
-  local name=$2
+  url_source="$1"
+  cert_name="$2"
 
-  echo "⏬ Downloading certificate from ${source}"
-  echo "📁 Save certificate to ${name}"
+  echo "⏬ Downloading certificate from ${url_source}"
+  echo "📁 Save certificate to ${cert_name}"
 
-  if [ -x "$(which wget)" ]; then
+  if [ -x "$(command -v wget)" ]; then
     set_insecure_flag wget
-    wget -q $flag $source -O $name
-  elif [ -x "$(which curl)" ]; then
+    # shellcheck disable=SC2086
+    wget -q $flag "$url_source" -O "$cert_name"
+  elif [ -x "$(command -v curl)" ]; then
     set_insecure_flag curl
-    curl -sfL $flag $source -o $name
+    # shellcheck disable=SC2086
+    curl -sfL $flag "$url_source" -o "$cert_name"
   else
     fatal "Could not find curl or wget, please install one."
   fi
 }
 
 verify_fingerprint() {
-  local file_path=$1
-  local expected=$2
+  file_path="$1"
+  expected="$2"
 
   # Skip verification if no fingerprint was provided for this index
   if [ -z "$expected" ]; then
@@ -61,12 +70,11 @@ verify_fingerprint() {
     fatal "openssl is required to verify certificate fingerprints but could not be found."
   fi
 
-  local actual
   actual=$(openssl x509 -in "$file_path" -noout -sha256 -fingerprint | cut -d'=' -f2)
 
   # Convert both strings to uppercase for a safe, case-insensitive comparison
-  local actual_upper=$(echo "$actual" | tr '[:lower:]' '[:upper:]')
-  local expected_upper=$(echo "$expected" | tr '[:lower:]' '[:upper:]')
+  actual_upper=$(echo "$actual" | tr '[:lower:]' '[:upper:]')
+  expected_upper=$(echo "$expected" | tr '[:lower:]' '[:upper:]')
 
   if [ "$actual_upper" != "$expected_upper" ]; then
     fatal "Fingerprint mismatch for ${file_path}! Expected [${expected_upper}], but got [${actual_upper}]."
@@ -76,32 +84,39 @@ verify_fingerprint() {
 }
 
 create_bundle() {
-  local filename=$1
+  bundle_filename="$1"
 
   if [ "${BUNDLE}" = "true" ]; then
-    local bundle="${filename}.bundle.crt"
-
+    bundle="${bundle_filename}.bundle.crt"
     echo "📦 Creating certificate bundle ${bundle}"
-    cat $(ls -1 -d "${dest_dir}/"* | grep "${filename}.*") > "${dest_dir}/${bundle}"
+
+    # Safely combine files using a temporary file
+    temp_bundle=$(mktemp)
+    for cert in "${dest_dir}/${bundle_filename}"*; do
+      if [ -f "$cert" ]; then
+        cat "$cert" >> "$temp_bundle"
+      fi
+    done
+    mv "$temp_bundle" "${dest_dir}/${bundle}"
   fi
 }
 
 echo "🔛 Activating feature '🔒 custom-root-ca'"
 
 counter=0
-filename=$(echo $NAME | cut -d . -f 1)
-extension=$(echo $NAME | cut -d . -f 2-)
-certs=$(echo $SOURCE | tr ',' '\n')
+filename=$(echo "$NAME" | cut -d . -f 1)
+extension=$(echo "$NAME" | cut -d . -f 2-)
+certs=$(echo "$SOURCE" | tr ',' '\n')
 dest_dir=/usr/local/share/ca-certificates
 
-mkdir -p $dest_dir
+mkdir -p "$dest_dir"
 
 for i in $certs; do
   # Extract the Nth fingerprint corresponding to the Nth URL
   idx=$((counter + 1))
   expected_fp=$(echo "$FINGERPRINTS" | awk -v col="$idx" -F',' '{print $col}')
 
-  if [ $counter -eq 0 ]; then
+  if [ "$counter" -eq 0 ]; then
     dest_file="${dest_dir}/${filename}.${extension}"
   else
     dest_file="${dest_dir}/${filename}-${counter}.${extension}"
@@ -113,6 +128,6 @@ for i in $certs; do
   counter=$((counter + 1))
 done
 
-create_bundle $filename
+create_bundle "$filename"
 
 update-ca-certificates
