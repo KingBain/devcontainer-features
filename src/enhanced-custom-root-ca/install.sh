@@ -9,6 +9,10 @@ FINGERPRINTS="${FINGERPRINTS:-}"
 BUNDLE="${BUNDLE:-true}"
 ALLOWINSECUREDOWNLOAD="${ALLOWINSECUREDOWNLOAD:-false}"
 
+if [ -z "${SOURCES}" ]; then
+  fatal "No certificate source was provided. Set the 'source' option to a certificate URL, or a comma-separated list of certificate URLs."
+fi
+
 fatal() {
   echo "⛔ " "$@" >&2
   exit 1
