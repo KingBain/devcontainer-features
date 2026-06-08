@@ -20,8 +20,8 @@ if [ -z "${SOURCES}" ]; then
 fi
 
 check_packages() {
-  if ! command -v curl > /dev/null 2>&1; then
-    echo "pkg: curl not found. Installing 'curl'..."
+  if ! command -v curl > /dev/null 2>&1 && ! command -v wget > /dev/null 2>&1; then
+    echo "pkg: Downloader not found. Attempting to install 'curl'..."
 
     if [ -x "$(command -v apt-get)" ]; then
       export DEBIAN_FRONTEND=noninteractive
@@ -30,7 +30,7 @@ check_packages() {
     elif [ -x "$(command -v apk)" ]; then
       apk add --no-cache curl ca-certificates
     else
-      fatal "curl was not found and could not be installed automatically because this image uses an unsupported package manager."
+      fatal "Neither curl nor wget found, and could not install curl automatically."
     fi
   fi
 
@@ -43,8 +43,6 @@ check_packages() {
       apt-get install -y --no-install-recommends ca-certificates
     elif [ -x "$(command -v apk)" ]; then
       apk add --no-cache ca-certificates
-    else
-      fatal "ca-certificates could not be installed automatically because this image uses an unsupported package manager."
     fi
   fi
 }
@@ -77,14 +75,14 @@ download() {
   echo "⏬ Downloading certificate from ${url_source}"
   echo "📁 Save certificate to ${cert_name}"
 
-  if [ -x "$(command -v curl)" ]; then
-    set_insecure_download_flag curl
-    # shellcheck disable=SC2086
-    curl --fail --location --show-error $flag "$url_source" --output "$cert_name"
-  elif [ -x "$(command -v wget)" ]; then
+  if [ -x "$(command -v wget)" ]; then
     set_insecure_download_flag wget
     # shellcheck disable=SC2086
-    wget $flag "$url_source" -O "$cert_name"
+    wget -q $flag "$url_source" -O "$cert_name"
+  elif [ -x "$(command -v curl)" ]; then
+    set_insecure_download_flag curl
+    # shellcheck disable=SC2086
+    curl -sfL $flag "$url_source" -o "$cert_name"
   else
     fatal "Could not find curl or wget, please install one."
   fi
