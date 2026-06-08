@@ -5,7 +5,7 @@ set -e
 source dev-container-features-test-lib
 
 not_exists() {
-    if [ ! -f $1 ]; then echo '1'; else echo '0'; fi
+  if [ ! -f $1 ]; then echo '1'; else echo '0'; fi
 }
 
 check "Cert installed" test /usr/local/share/ca-certificates/custom.crt
