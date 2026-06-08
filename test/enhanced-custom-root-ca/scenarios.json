@@ -32,14 +32,5 @@
         "fingerprints": "FE:E0:9E:77:43:BF:D4:3E:D7:D4:D3:ED:50:6C:C7:9D:2D:90:70:FF:A9:29:91:16:87:D4:27:33:70:BE:A3:06"
       }
     }
-  },
-  "fingerprint-mismatch": {
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-      "enhanced-custom-root-ca": {
-        "source": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt",
-        "fingerprints": "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"
-      }
-    }
   }
 }
