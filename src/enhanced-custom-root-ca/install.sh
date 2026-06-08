@@ -14,6 +14,32 @@ fatal() {
   exit 1
 }
 
+check_packages() {
+  if ! command -v curl > /dev/null 2>&1 && ! command -v wget > /dev/null 2>&1; then
+    echo "pkg: Downloader not found. Attempting to install 'curl'..."
+    if [ -x "$(command -v apt-get)" ]; then
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y --no-install-recommends curl ca-certificates
+    elif [ -x "$(command -v apk)" ]; then
+      apk add --no-cache curl ca-certificates
+    else
+      fatal "Neither curl nor wget found, and could not install curl automatically (unsupported package manager)."
+    fi
+  fi
+
+  if ! command -v update-ca-certificates > /dev/null 2>&1; then
+    echo "pkg: 'update-ca-certificates' not found. Installing 'ca-certificates'..."
+    if [ -x "$(command -v apt-get)" ]; then
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y --no-install-recommends ca-certificates
+    elif [ -x "$(command -v apk)" ]; then
+      apk add --no-cache ca-certificates
+    fi
+  fi
+}
+
 set_insecure_flag() {
   downloader="$1"
   flag=""
@@ -102,6 +128,8 @@ create_bundle() {
 }
 
 echo "🔛 Activating feature '🔒 custom-root-ca'"
+
+check_packages
 
 counter=0
 filename=$(echo "$NAME" | cut -d . -f 1)
