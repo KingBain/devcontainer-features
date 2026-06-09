@@ -71,6 +71,7 @@ set_insecure_download_flag() {
 download() {
   url_source="$1"
   cert_name="$2"
+  user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
   echo "⏬ Downloading certificate from ${url_source}"
   echo "📁 Save certificate to ${cert_name}"
@@ -80,6 +81,7 @@ download() {
     curl \
       -4 \
       -vfL \
+      --user-agent "$user_agent" \
       --connect-timeout 15 \
       --max-time 60 \
       --retry 3 \
@@ -93,6 +95,7 @@ download() {
     set_insecure_download_flag wget
     wget \
       -4 \
+      --user-agent="$user_agent" \
       -T 60 \
       -t 3 \
       $flag \
