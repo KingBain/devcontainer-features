@@ -100,6 +100,7 @@ download() {
       --user-agent "$user_agent" \
       --connect-timeout 15 \
       --max-time 60 \
+      --dns-cache-timeout 0 \
       --retry 3 \
       --retry-delay 3 \
       --retry-all-errors \
