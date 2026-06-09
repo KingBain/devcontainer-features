@@ -43,6 +43,22 @@ check_packages() {
       apt-get install -y --no-install-recommends ca-certificates
     elif [ -x "$(command -v apk)" ]; then
       apk add --no-cache ca-certificates
+    else
+      fatal "update-ca-certificates is required but could not be installed automatically."
+    fi
+  fi
+
+  if [ -n "${FINGERPRINTS}" ] && ! command -v openssl > /dev/null 2>&1; then
+    echo "pkg: 'openssl' not found. Installing 'openssl' because certificate fingerprints were provided..."
+
+    if [ -x "$(command -v apt-get)" ]; then
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -y
+      apt-get install -y --no-install-recommends openssl
+    elif [ -x "$(command -v apk)" ]; then
+      apk add --no-cache openssl
+    else
+      fatal "openssl is required to verify certificate fingerprints but could not be installed automatically."
     fi
   fi
 }
