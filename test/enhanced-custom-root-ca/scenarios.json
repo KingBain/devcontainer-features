@@ -15,26 +15,45 @@
       }
     }
   },
-  "ubuntu-custom-name-no-bundle": {
+
+  "ubuntu-custom-name-with-bundle": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "enhanced-custom-root-ca": {
         "name": "custom.crt",
-        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt",
-        "bundle": false
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
       }
     }
   },
-  "alpine-custom-name-no-bundle": {
+  "alpine-custom-name-with-bundle": {
     "image": "mcr.microsoft.com/devcontainers/base:alpine",
     "features": {
       "enhanced-custom-root-ca": {
         "name": "custom.crt",
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
+      }
+    }
+  },
+
+  "ubuntu-default-name-no-bundle": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "enhanced-custom-root-ca": {
         "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt",
         "bundle": false
       }
     }
   },
+  "alpine-default-name-no-bundle": {
+    "image": "mcr.microsoft.com/devcontainers/base:alpine",
+    "features": {
+      "enhanced-custom-root-ca": {
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt",
+        "bundle": false
+      }
+    }
+  },
+
   "ubuntu-multiple-sources-with-bundle": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
@@ -53,6 +72,7 @@
       }
     }
   },
+
   "ubuntu-fingerprint-success": {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
