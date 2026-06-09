@@ -75,16 +75,7 @@ download() {
   echo "⏬ Downloading certificate from ${url_source}"
   echo "📁 Save certificate to ${cert_name}"
 
-  if [ -x "$(command -v wget)" ]; then
-    set_insecure_download_flag wget
-    wget \
-      -q \
-      -T 60 \
-      -t 3 \
-      $flag \
-      "$url_source" \
-      -O "$cert_name"
-  elif [ -x "$(command -v curl)" ]; then
+  if [ -x "$(command -v curl)" ]; then
     set_insecure_download_flag curl
     curl \
       -sfL \
@@ -96,6 +87,18 @@ download() {
       $flag \
       "$url_source" \
       -o "$cert_name"
+
+  elif [ -x "$(command -v wget)" ]; then
+    set_insecure_download_flag wget
+    wget \
+      -4 \
+      -q \
+      -T 60 \
+      -t 3 \
+      $flag \
+      "$url_source" \
+      -O "$cert_name"
+
   else
     fatal "Could not find curl or wget, please install one."
   fi
