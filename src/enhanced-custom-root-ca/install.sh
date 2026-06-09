@@ -78,6 +78,7 @@ download() {
   if [ -x "$(command -v curl)" ]; then
     set_insecure_download_flag curl
     curl \
+      -4 \
       -sfL \
       --connect-timeout 15 \
       --max-time 60 \
