@@ -4,7 +4,8 @@
     "features": {
       "enhanced-custom-root-ca": {
         "name": "custom.crt",
-        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt",
+        "bundle": false
       }
     }
   },
