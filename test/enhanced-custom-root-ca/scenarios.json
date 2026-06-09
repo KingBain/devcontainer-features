@@ -22,7 +22,7 @@
     "features": {
       "enhanced-custom-root-ca": {
         "name": "custom.sub.crt",
-        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
+        "sources": "http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt,http://pki-icp.canada.ca/aia/GoC-GdC-Root-A.crt"
       }
     }
   },
