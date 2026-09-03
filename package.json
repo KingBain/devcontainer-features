@@ -9,6 +9,6 @@
     "devcontainer:docs": "devcontainer features generate-docs --project-folder ./src"
   },
   "devDependencies": {
-    "@devcontainers/cli": "0.87.0"
+    "@devcontainers/cli": "0.89.0"
   }
 }
